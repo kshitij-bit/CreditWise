@@ -1,0 +1,39 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Model artifacts (large binary files, not for git)
+ml/artifacts/*.pkl
+ml/artifacts/*.joblib
+ml/artifacts/*.h5
+ml/artifacts/*.json
+
+# Environment variables
+.env
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# SQLite development databases
+data/*.db
+data/*.db-journal
+data/*.sqlite
+data/*.sqlite3

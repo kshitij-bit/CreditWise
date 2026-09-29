@@ -1,0 +1,14 @@
+pandas
+numpy
+scikit-learn
+matplotlib
+seaborn
+jupyter
+xgboost
+catboost
+imbalanced-learn
+shap
+Flask
+Flask-SQLAlchemy
+Flask-CORS
+Flask-JWT-Extended
