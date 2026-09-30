@@ -61,11 +61,66 @@ All compared using stratified cross-validation.
 
 ## Current Status
 
-**Phase:** 1 — Project setup (in progress)
+**Implemented:** Production model training and inference, a Flask API with SQLite persistence and authentication, and a React frontend. See the phases in the repository for implementation details.
 
 ## How to Run
 
-Instructions will be added as each phase is completed.
+### Prerequisites
+
+- Python with the packages listed in `requirements.txt`
+- Node.js and npm
+
+Run these commands from the project root unless a different directory is shown.
+
+### 1. Install dependencies
+
+```powershell
+python -m pip install -r requirements.txt
+cd frontend
+npm ci
+cd ..
+```
+
+### 2. Generate the production model artifacts
+
+The model is trained from the bundled public dataset. Generate the model before starting the API:
+
+```powershell
+python ml/train_production.py
+```
+
+This creates `ml/artifacts/creditwise_model.joblib` and `ml/artifacts/model_metadata.json`. These generated artifacts are excluded from Git; regenerate them locally after cloning.
+
+### 3. Start the backend
+
+In a terminal at the project root:
+
+```powershell
+python backend/app.py
+```
+
+The API starts at `http://127.0.0.1:5000`. Check model availability at `http://127.0.0.1:5000/api/health`.
+
+### 4. Start the frontend
+
+In another terminal:
+
+```powershell
+cd frontend
+npm run dev
+```
+
+Open the local URL printed by Vite. Register an account in the app to use authenticated features.
+
+### Tests
+
+From the project root, run the backend test suite with:
+
+```powershell
+pytest tests/ -v
+```
+
+The API uses a development-only JWT secret when `JWT_SECRET_KEY` is unset. Set that environment variable to a private value outside local development.
 
 ## License
 
