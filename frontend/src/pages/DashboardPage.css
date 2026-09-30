@@ -1,0 +1,15 @@
+.dashboard-page { color: #181c20; }
+.dashboard-card { border: 1px solid #e1e5f0; border-radius: 8px; background: #fff; box-shadow: 0 2px 8px rgba(28, 44, 84, .035); }
+.dashboard-label { color: #6d7486; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.dashboard-section-title { color: #181c20; font-size: 15px; font-weight: 700; }
+.dashboard-subtitle { color: #8b91a3; font-size: 11px; margin-top: 2px; }
+.dashboard-eyebrow { color: #6d7486; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.dashboard-eyebrow span { color: #2457d6; padding: 0 5px; }
+.kpi-icon { align-items: center; border-radius: 5px; display: flex; font-size: 18px; height: 24px; justify-content: center; width: 24px; }
+.kpi-icon.blue { background: #e7edff; color: #2457d6; }.kpi-icon.amber { background: #fff3dc; color: #f79009; }.kpi-icon.red { background: #ffebe9; color: #f04438; }.kpi-icon.green { background: #e5f8ef; color: #12b76a; }
+.dashboard-filter, .dashboard-action, .dashboard-input { border: 1px solid #d9deeb; border-radius: 5px; font-size: 11px; padding: 9px 11px; }
+.dashboard-filter { background: #fff; color: #434654; }.dashboard-filter span { color: #8b91a3; margin-left: 8px; }
+.dashboard-action { background: #2457d6; border-color: #2457d6; color: #fff; font-weight: 700; }.dashboard-action:hover { background: #003fb3; }
+.dashboard-input { background: #fff; color: #181c20; outline: none; }.dashboard-input:focus { border-color: #2457d6; box-shadow: 0 0 0 2px rgba(36,87,214,.12); }
+.dashboard-error { align-items: center; background: #fff5f4; border: 1px solid #f6c7c3; border-radius: 7px; color: #b42318; display: flex; font-size: 13px; justify-content: space-between; margin-bottom: 16px; padding: 12px 14px; }.dashboard-error button { border: 1px solid #f04438; border-radius: 4px; font-size: 12px; font-weight: 700; padding: 6px 10px; }
+.page-button, .page-number { border: 1px solid #dfe3f0; border-radius: 4px; padding: 5px 8px; }.page-button:disabled { color: #b9bfce; cursor: not-allowed; }.page-number { background: #2457d6; border-color: #2457d6; color: #fff; font-weight: 700; }

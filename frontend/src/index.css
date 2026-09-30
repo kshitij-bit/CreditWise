@@ -14,3 +14,34 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+@media print {
+  body,
+  #root {
+    height: auto;
+    background: #fff;
+  }
+
+  .creditwise-shell aside,
+  .creditwise-shell header,
+  .report-header button,
+  .report-header a {
+    display: none !important;
+  }
+
+  .creditwise-shell main {
+    overflow: visible;
+    padding: 0;
+  }
+
+  .report-page {
+    max-width: none;
+    color: #181c20;
+  }
+
+  .report-section,
+  .report-page section {
+    break-inside: avoid;
+    box-shadow: none !important;
+  }
+}

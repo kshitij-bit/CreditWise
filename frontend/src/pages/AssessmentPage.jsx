@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { createPrediction } from '../api/predictions';
 import ErrorMessage from '../components/common/ErrorMessage';
 import LoadingSpinner from '../components/common/LoadingSpinner';
-import StatCard from '../components/common/StatCard';
 import { formatPercent } from '../lib/format';
+import './AssessmentPage.css';
 import {
   HOME_OWNERSHIP_OPTIONS,
   LOAN_INTENT_OPTIONS,
@@ -67,228 +67,95 @@ export default function AssessmentPage() {
     }
   };
 
+  const resetForm = () => {
+    setResult(null);
+    setError(null);
+    setForm(emptyForm);
+  };
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">New Assessment</h1>
-        <p className="text-sm text-slate-500">
-          Enter applicant information to predict default probability.
-        </p>
-      </div>
+    <div className="assessment-page">
+      <header className="assessment-page-header">
+        <div>
+          <p className="assessment-eyebrow">Underwriting suite <span>•</span> Production environment</p>
+          <h1>New Credit Assessment</h1>
+          <p>Evaluate an applicant&apos;s probability of default using the CreditWise AI risk model.</p>
+        </div>
+        <div className="assessment-model-card">
+          <span className="assessment-model-icon">◈</span>
+          <div><strong>creditwise-xgb-v1</strong><small>XGBoost production model</small></div>
+        </div>
+      </header>
 
       {error && <ErrorMessage message={error} />}
 
-      {result ? (
-        <ResultPanel result={result} onReset={() => { setResult(null); setForm(emptyForm); }} />
-      ) : (
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-6 rounded-xl border border-slate-200 bg-white p-6 lg:grid-cols-2">
-          <section className="space-y-4">
-            <h2 className="text-sm font-semibold text-slate-700">Personal</h2>
+      <div className="assessment-layout">
+        <form onSubmit={handleSubmit} className="assessment-form">
+          <AssessmentSection number="01" title="Applicant Profile" subtitle="Primary financial, demographic and employment characteristics" tag="Demographics">
+            <Field label="Applicant Age (years)" name="person_age" value={form.person_age} onChange={handleNumberField} type="number" min="18" max="100" required placeholder="e.g. 35" suffix="YRS" />
+            <Field label="Annual Income (USD)" name="person_income" value={form.person_income} onChange={handleNumberField} type="number" min="0" required placeholder="e.g. 65000" prefix="$" />
+            <SelectField label="Home Ownership Status" name="person_home_ownership" value={form.person_home_ownership} onChange={handleChange} options={HOME_OWNERSHIP_OPTIONS} />
+            <Field label="Employment Length" name="person_emp_length" value={form.person_emp_length} onChange={handleNumberField} type="number" min="0" max="45" placeholder="e.g. 7" suffix="Years" />
+          </AssessmentSection>
 
-            <div>
-              <label htmlFor="person_age" className="mb-1 block text-sm font-medium text-slate-700">
-                Age <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="person_age"
-                name="person_age"
-                type="number"
-                min="18"
-                max="100"
-                required
-                value={form.person_age}
-                onChange={handleNumberField}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
-                placeholder="e.g. 35"
-              />
-            </div>
+          <AssessmentSection number="02" title="Loan Specifications" subtitle="Requested credit facility terms and stated financing intent" tag="Exposure">
+            <Field label="Loan Amount (USD)" name="loan_amnt" value={form.loan_amnt} onChange={handleNumberField} type="number" min="0" required placeholder="e.g. 12000" prefix="$" />
+            <SelectField label="Loan Intent Category" name="loan_intent" value={form.loan_intent} onChange={handleChange} options={LOAN_INTENT_OPTIONS} />
+          </AssessmentSection>
 
-            <div>
-              <label htmlFor="person_income" className="mb-1 block text-sm font-medium text-slate-700">
-                Annual Income (USD) <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="person_income"
-                name="person_income"
-                type="number"
-                min="0"
-                required
-                value={form.person_income}
-                onChange={handleNumberField}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
-                placeholder="e.g. 65000"
-              />
-            </div>
+          <AssessmentSection number="03" title="Bureau & Credit History" subtitle="Historical bureau delinquency indicators and trade line seasoning" tag="Bureau">
+            <SelectField label="Default on File (credit bureau)" name="cb_person_default_on_file" value={form.cb_person_default_on_file} onChange={handleChange} options={DEFAULT_ON_FILE_OPTIONS} />
+            <Field label="Credit History Length (years)" name="cb_person_cred_hist_length" value={form.cb_person_cred_hist_length} onChange={handleNumberField} type="number" min="0" max="40" placeholder="e.g. 5" suffix="Years" />
+          </AssessmentSection>
 
-            <div>
-              <label htmlFor="person_home_ownership" className="mb-1 block text-sm font-medium text-slate-700">
-                Home Ownership
-              </label>
-              <select
-                id="person_home_ownership"
-                name="person_home_ownership"
-                value={form.person_home_ownership}
-                onChange={handleChange}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
-              >
-                {HOME_OWNERSHIP_OPTIONS.map((opt) => (
-                  <option key={opt} value={opt}>{opt}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="person_emp_length" className="mb-1 block text-sm font-medium text-slate-700">
-                Employment Length (years)
-              </label>
-              <input
-                id="person_emp_length"
-                name="person_emp_length"
-                type="number"
-                min="0"
-                max="45"
-                value={form.person_emp_length}
-                onChange={handleNumberField}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
-                placeholder="e.g. 7"
-              />
-            </div>
-          </section>
-
-          <section className="space-y-4">
-            <h2 className="text-sm font-semibold text-slate-700">Loan</h2>
-
-            <div>
-              <label htmlFor="loan_amnt" className="mb-1 block text-sm font-medium text-slate-700">
-                Loan Amount (USD) <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="loan_amnt"
-                name="loan_amnt"
-                type="number"
-                min="0"
-                required
-                value={form.loan_amnt}
-                onChange={handleNumberField}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
-                placeholder="e.g. 12000"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="loan_intent" className="mb-1 block text-sm font-medium text-slate-700">
-                Loan Intent
-              </label>
-              <select
-                id="loan_intent"
-                name="loan_intent"
-                value={form.loan_intent}
-                onChange={handleChange}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
-              >
-                {LOAN_INTENT_OPTIONS.map((opt) => (
-                  <option key={opt} value={opt}>{opt}</option>
-                ))}
-              </select>
-            </div>
-
-            </section>
-
-          <section className="space-y-4 lg:col-span-2">
-            <h2 className="text-sm font-semibold text-slate-700">Credit History</h2>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
-                <label htmlFor="cb_person_default_on_file" className="mb-1 block text-sm font-medium text-slate-700">
-                  Default on File (credit bureau)
-                </label>
-                <select
-                  id="cb_person_default_on_file"
-                  name="cb_person_default_on_file"
-                  value={form.cb_person_default_on_file}
-                  onChange={handleChange}
-                  className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
-                >
-                  {DEFAULT_ON_FILE_OPTIONS.map((opt) => (
-                    <option key={opt} value={opt}>{opt}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="cb_person_cred_hist_length" className="mb-1 block text-sm font-medium text-slate-700">
-                  Credit History Length (years)
-                </label>
-                <input
-                  id="cb_person_cred_hist_length"
-                  name="cb_person_cred_hist_length"
-                  type="number"
-                  min="0"
-                  max="40"
-                  value={form.cb_person_cred_hist_length}
-                  onChange={handleNumberField}
-                  className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
-                  placeholder="e.g. 5"
-                />
-              </div>
-            </div>
-          </section>
-
-          <div className="lg:col-span-2">
-            <button
-              type="submit"
-              disabled={submitting}
-              className="w-full rounded-md bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:opacity-50 lg:w-auto lg:px-8"
-            >
-              {submitting ? 'Predicting…' : 'Run Prediction'}
+          <div className="assessment-actions">
+            <button type="submit" disabled={submitting} className="assessment-primary-button">
+              {submitting ? <><span className="assessment-spinner" /> Running Risk Assessment...</> : <>Run Risk Assessment <span>→</span></>}
             </button>
+            <button type="button" onClick={resetForm} className="assessment-secondary-button">Reset Form</button>
+            <span className="assessment-action-note">Inference via creditwise-xgb-v1</span>
           </div>
         </form>
-      )}
+
+        <ResultPanel result={result} submitting={submitting} onReset={resetForm} />
+      </div>
+
+      <div className="assessment-info-grid">
+        <InfoCard icon="▣" title="Feature Coverage" value={`${Object.keys(emptyForm).length} application inputs`} />
+        <InfoCard icon="◌" title="Model Version" value={result?.model_version || 'creditwise-xgb-v1'} />
+        <InfoCard icon="✓" title="Inference Status" value={submitting ? 'Processing request' : result ? 'Assessment complete' : 'Ready for assessment'} />
+      </div>
     </div>
   );
 }
 
-function ResultPanel({ result, onReset }) {
+function AssessmentSection({ number, title, subtitle, tag, children }) {
+  return <section className="assessment-section"><div className="assessment-section-heading"><span className="assessment-section-number">{number}</span><div><h2>{title}</h2><p>{subtitle}</p></div><span className="assessment-section-tag">{tag}</span></div><div className="assessment-fields">{children}</div></section>;
+}
+
+function Field({ label, name, value, onChange, required, prefix, suffix, ...props }) {
+  return <label className="assessment-field"><span>{label} {required && <b>*</b>}</span><div className="assessment-input-wrap">{prefix && <i>{prefix}</i>}<input id={name} name={name} value={value} onChange={onChange} required={required} {...props} />{suffix && <em>{suffix}</em>}</div></label>;
+}
+
+function SelectField({ label, name, value, onChange, options, required }) {
+  return <label className="assessment-field"><span>{label} {required && <b>*</b>}</span><select id={name} name={name} value={value} onChange={onChange} required={required}>{options.map((option) => <option key={option} value={option}>{option}</option>)}</select></label>;
+}
+
+function InfoCard({ icon, title, value }) {
+  return <div className="assessment-info-card"><span>{icon}</span><div><small>{title}</small><strong>{value}</strong></div></div>;
+}
+
+function ResultPanel({ result, submitting, onReset }) {
+  if (submitting) return <aside className="assessment-result-panel assessment-result-loading"><div className="result-empty-icon">◌</div><h2>Running assessment</h2><p>The production model is evaluating the submitted application.</p><span className="assessment-spinner" /></aside>;
+  if (!result) return <aside className="assessment-result-panel"><div className="result-empty-icon">◈</div><p className="assessment-eyebrow">Assessment result</p><h2>Ready for Assessment</h2><p>Complete the applicant information and run the risk assessment to generate model results.</p><div className="result-empty-line"><span />Awaiting application data</div></aside>;
+
   const riskStyle = getRiskCategoryStyle(result.risk_category);
   const decisionStyle = getDecisionStyle(result.decision);
+  const probability = Number(result.default_risk_probability || 0);
+  const riskPosition = Math.max(0, Math.min(100, Number(result.risk_score || probability * 100)));
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-6">
-      <div className="mb-6 flex flex-wrap items-center gap-3">
-        <span className={`rounded-full px-3 py-1 text-sm font-semibold ${riskStyle.bg} ${riskStyle.text}`}>
-          {result.risk_category}
-        </span>
-        <span className={`rounded-full px-3 py-1 text-sm font-semibold ${decisionStyle.bg} ${decisionStyle.text}`}>
-          {result.decision}
-        </span>
-        <span className="ml-auto text-sm text-slate-500">
-          Risk Score: <b>{result.risk_score}</b>/100
-        </span>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatCard label="Default-Risk Probability" value={formatPercent(result.default_risk_probability, 2)} />
-        <StatCard label="CreditWise Risk Score" value={`${result.risk_score} / 100`} hint="0–100, higher = greater predicted default risk" />
-        <StatCard label="Model Version" value={result.model_version || '—'} />
-      </div>
-
-      {result.message && (
-        <p className="mt-4 text-xs text-slate-400">{result.message}</p>
-      )}
-
-      {result.classification_threshold != null && (
-        <p className="mt-1 text-xs text-slate-400">
-          Classification Threshold: {result.classification_threshold}
-        </p>
-      )}
-
-      <div className="mt-6 flex gap-3">
-        <button
-          onClick={onReset}
-          className="rounded-md bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-200"
-        >
-          ↺ New Assessment
-        </button>
-      </div>
-    </div>
+    <aside className="assessment-result-panel"><div className="result-heading"><div><p className="assessment-eyebrow">Assessment result</p><h2>Risk assessment complete</h2><small>Execution timestamp: {new Date().toLocaleString()}</small></div><span className={`result-badge ${riskStyle.bg} ${riskStyle.text}`}>{result.risk_category}</span></div><div className="result-metrics"><div><small>Risk score</small><strong>{result.risk_score}<i>/100</i></strong></div><div><small>Default prob. (PD)</small><strong>{formatPercent(result.default_risk_probability, 2)}</strong></div></div><div className="risk-meter"><div className="risk-meter-labels"><span>Low (0-40)</span><span>Moderate (41-75)</span><span>High (76-100)</span></div><div className="risk-meter-bar"><span className="low" /><span className="moderate" /><span className="high" /><b style={{ left: `${riskPosition}%` }} /></div></div><div className={`decision-block ${decisionStyle.bg}`}><strong>{result.decision}</strong><p>{result.message || 'Outcome generated from the production risk model.'}</p></div><div className="result-factors"><div className="result-subheading"><strong>Assessment factors</strong><small>Observed inputs</small></div><Factor label="Application data validated" value="Complete" positive /><Factor label="Classification threshold" value={result.classification_threshold ?? '—'} /><Factor label="Model version" value={result.model_version || '—'} /></div><div className="result-trace"><strong>Data verification trace</strong><p><span>Prediction API</span><b>Successful</b></p><p><span>Input validation</span><b>Passed</b></p><p><span>Inference model</span><b>{result.model_version || 'Production'}</b></p></div><button type="button" onClick={onReset} className="assessment-secondary-button result-reset">Start New Assessment</button></aside>
   );
 }
+
+function Factor({ label, value, positive }) { return <div className="factor-row"><span className={positive ? 'factor-positive' : ''}>{positive ? '✓' : '•'} {label}</span><b>{value}</b></div>; }

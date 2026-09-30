@@ -34,8 +34,10 @@ export function AuthProvider({ children }) {
     }
     fetchMe()
       .then((data) => {
-        setUser(data.user);
-        localStorage.setItem('cw_user', JSON.stringify(data.user));
+        // /auth/me returns the user directly; login returns it under `user`.
+        const currentUser = data.user || data;
+        setUser(currentUser);
+        localStorage.setItem('cw_user', JSON.stringify(currentUser));
       })
       .catch(() => {
         localStorage.removeItem('cw_token');
